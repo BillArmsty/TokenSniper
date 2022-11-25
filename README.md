@@ -10,8 +10,8 @@ A sniper bot on the ethereum network
 
 # BOT FEATURES
 
--A Single buy after liquidity is added
--Approve after buying
--Sell until set conditions are met
-
-
+<ol>
+<li>-A Single buy after liquidity is added</li>
+<li>-Approve after buying</li>
+<li>-Sell until set conditions are met</li>
+</ol>
