@@ -1,19 +1,21 @@
 /** @format */
 
-import { ethers } from "ethers";
+import { ethers, utils } from "ethers";
 import {
-  approveABI,
   buyAmount,
   config,
   gasLimit,
-  MAX_INT,
+  SLIPPAGE,
+  walletAddress,
   wssProvider,
 } from "../Config/config";
 import { Overloads, txContents } from "../contents/interface";
 import ABI from "../utils/contract-abi.json";
 import { buy } from "../uniSwap/buy";
-import { account, signer } from "../contents/common";
 import { approve } from "../uniSwap/approveToken";
+// import { Contract } from "../contents/common";
+import UNISWAP_ABI from "../utils/contract-abi.json";
+import { Contract } from "../contents/common";
 import { swapExactTokensForETHSupportingFeeOnTransferTokens } from "../uniSwap/sellToken";
 
 const methodsExcluded = ["0x0", "0x"];
@@ -70,8 +72,8 @@ export const dataProcessing = async (txContents: txContents) => {
       // Filter the addLiquidity method
       if (methodName == "addLiquidity") {
         let token;
-        let tokenA = decodedData.args.tokenA.toLocaleLowerCase();
-        let tokenB = decodedData.args.tokenB.toLocaleLowerCase();
+        let tokenA = decodedData.args.token.toLocaleLowerCase();
+        let tokenB = decodedData.args.token.toLocaleLowerCase();
         console.log(`TokenA: ${tokenA}, TokenB: ${tokenB}`);
 
         if (tokenA === tokensToMonitor[0]) {
@@ -97,11 +99,34 @@ export const dataProcessing = async (txContents: txContents) => {
 
               if (approveHash.success === true) {
                 let sellPath = [token, config.WETH_ADDRESS];
-                overloads["nonce"]! += 1;
-                await swapExactTokensForETHSupportingFeeOnTransferTokens(
-                  sellPath,
-                  overloads
+
+                const tokenContract = new ethers.Contract(
+                  token,
+                  UNISWAP_ABI,
+                  wssProvider
                 );
+
+                const amountIn = await tokenContract.balanceOf(walletAddress);
+                const amountOut = await Contract.getAmountsOut(
+                  amountIn,
+                  sellPath
+                );
+                const buyamount = parseInt(amountIn._hex) / 10 ** 18;
+                const amountOutTx = parseInt(amountOut[1]._hex) / 10 ** 18;
+
+                const amountOutMin = amountOutTx * ((100 - SLIPPAGE) / 100);
+                console.log("amountIn", buyamount);
+                console.log("amountOutMin", amountOutMin);
+
+                if (amountOutMin > 0) {
+                  overloads["nonce"]! += 1;
+                  await swapExactTokensForETHSupportingFeeOnTransferTokens(
+                    sellPath,
+                    overloads,
+                    amountIn,
+                    ethers.utils.parseEther(amountOutMin.toString())
+                  );
+                }
               }
             }
           }

@@ -1,7 +1,7 @@
 /** @format */
 
 import { ethers } from "ethers";
-import { sellToWalletAddress } from "../Config/config";
+import { walletAddress } from "../Config/config";
 import { Overloads } from "../contents/interface";
 // import ABI from "../utils/contract-abi.json";
 import { Contract } from "../contents/common";
@@ -12,12 +12,12 @@ import { Contract } from "../contents/common";
 export const swapExactTokensForETHSupportingFeeOnTransferTokens = async (
   path: string[],
   overLoads: Overloads,
-  // amountIn: number,
-  // amountOutMin: number
+  amountIn: any,
+  amountOutMin: any
 ) => {
   try {
-    let amountIn = ethers.utils.parseEther("0.001");
-    let amountOutMin = ethers.utils.parseEther("0");
+    // let amountIn = ethers.utils.parseEther("0.001");
+    // let amountOutMin = ethers.utils.parseEther("0");
     let deadline = Math.floor(Date.now() / 1000) + 60 * 2;
 
     const tx =
@@ -25,7 +25,7 @@ export const swapExactTokensForETHSupportingFeeOnTransferTokens = async (
         amountIn,
         amountOutMin,
         path,
-        sellToWalletAddress,
+        walletAddress,
         deadline,
         overLoads
       );
