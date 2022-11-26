@@ -1,12 +1,10 @@
 /** @format */
 
-import { ethers, utils } from "ethers";
+import { ethers } from "ethers";
 import {
   buyAmount,
   config,
   gasLimit,
-  SLIPPAGE,
-  walletAddress,
   wssProvider,
 } from "../Config/config";
 import { Overloads, txContents } from "../contents/interface";
@@ -14,8 +12,6 @@ import ABI from "../utils/contract-abi.json";
 import { buy } from "../uniSwap/buy";
 import { approve } from "../uniSwap/approveToken";
 // import { Contract } from "../contents/common";
-import UNISWAP_ABI from "../utils/contract-abi.json";
-import { Contract } from "../contents/common";
 import { swapExactTokensForETHSupportingFeeOnTransferTokens } from "../uniSwap/sellToken";
 import { getAmounts } from "../uniSwap/getAmounts";
 
