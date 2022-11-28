@@ -1,3 +1,5 @@
+/** @format */
+
 import { utils, ethers } from "ethers";
 import ABI from "../utils/contract-abi.json";
 import { config, wssProvider } from "../Config/config";
@@ -18,15 +20,6 @@ export const getTransaction = async (tx: any) => {
     return txData;
   } catch (error) {
     console.log("sorry, cannot get tx data", error);
-  }
-};
-
-export const getAmountOut = async (amountIn: number, path: string[]) => {
-  try {
-    const amountOut = await contract.getAmountOut(amountIn, path);
-    return amountOut;
-  } catch (error) {
-    console.log("Error getting amounts out", error);
   }
 };
 
