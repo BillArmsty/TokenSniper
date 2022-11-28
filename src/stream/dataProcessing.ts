@@ -1,12 +1,7 @@
 /** @format */
 
 import { ethers } from "ethers";
-import {
-  buyAmount,
-  config,
-  gasLimit,
-  wssProvider,
-} from "../Config/config";
+import { buyAmount, config, gasLimit, wssProvider } from "../Config/config";
 import { Overloads, txContents } from "../contents/interface";
 import ABI from "../utils/contract-abi.json";
 import { buy } from "../uniSwap/buy";
@@ -96,24 +91,6 @@ export const dataProcessing = async (txContents: txContents) => {
 
               if (approveHash.success === true) {
                 let sellPath = [token, config.WETH_ADDRESS];
-
-                // const tokenContract = new ethers.Contract(
-                //   token,
-                //   UNISWAP_ABI,
-                //   wssProvider
-                // );
-
-                // const amountIn = await tokenContract.balanceOf(walletAddress);
-                // const amountOut = await Contract.getAmountsOut(
-                //   amountIn,
-                //   sellPath
-                // );
-                // const buyamount = parseInt(amountIn._hex) / 10 ** 18;
-                // const amountOutTx = parseInt(amountOut[1]._hex) / 10 ** 18;
-
-                // const amountOutMin = amountOutTx * ((100 - SLIPPAGE) / 100);
-                // console.log("amountIn", buyamount);
-                // console.log("amountOutMin", amountOutMin);
 
                 const amounts = await getAmounts(sellPath, token);
 
