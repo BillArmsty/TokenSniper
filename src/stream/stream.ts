@@ -1,6 +1,4 @@
-/** @format */
-
-import { wssProvider } from "../Config/config";
+import { wssProvider } from "../config/config";
 import { getTransaction, wait } from "../contents/common";
 import { txContents } from "../contents/interface";
 import { dataProcessing } from "./dataProcessing";

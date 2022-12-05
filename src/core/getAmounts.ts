@@ -1,9 +1,8 @@
-/** @format */
-
 import { ethers, utils } from "ethers";
-import { SLIPPAGE, walletAddress, wssProvider } from "../Config/config";
+import { SLIPPAGE, walletAddress, wssProvider } from "../config/config";
 import { Contract } from "../contents/common";
-import UNISWAP_ABI from "../utils/contract-abi.json";
+import { UNISWAP_ABI } from "../utils/uniswap";
+
 
 export const getAmounts = async (sellPath: string[], token: string) => {
   try {

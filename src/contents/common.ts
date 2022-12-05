@@ -1,18 +1,17 @@
-/** @format */
-
 import { utils, ethers } from "ethers";
-import ABI from "../utils/contract-abi.json";
-import { config, wssProvider } from "../Config/config";
 
-export const abiInterface = new ethers.utils.Interface(ABI);
+import { config, wssProvider } from "../config/config";
+import { UNISWAP_ABI } from "../utils/uniswap";
+
+export const abiInterface = new ethers.utils.Interface(UNISWAP_ABI);
 export const signer = new ethers.Wallet(config.PRIVATE_KEY);
 export const account = signer.connect(config.provider);
 export const Contract = new ethers.Contract(
   config.UNISWAP_ROUTER,
-  ABI,
+  UNISWAP_ABI,
   account
 );
-export const contract = new ethers.Contract(config.UNISWAP_ROUTER, ABI);
+export const contract = new ethers.Contract(config.UNISWAP_ROUTER, UNISWAP_ABI);
 
 export const getTransaction = async (tx: any) => {
   try {

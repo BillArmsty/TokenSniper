@@ -1,7 +1,7 @@
-/** @format */
+
 
 import { ethers } from "ethers";
-import { walletAddress } from "../Config/config";
+import { walletAddress } from "../config/config";
 import { Overloads } from "../contents/interface";
 // import ABI from "../utils/contract-abi.json";
 import { Contract } from "../contents/common";
@@ -20,8 +20,8 @@ export const buy = async (path: string[], overLoads: Overloads) => {
       deadline,
       overLoads
     );
-     console.log("\n\n\n ************** BUY ***************\n");
-     console.log(tx);
+    console.log("\n\n\n ************** BUY ***************\n");
+    console.log(tx);
 
     return { success: true, data: tx.hash };
   } catch (error) {

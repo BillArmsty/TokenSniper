@@ -1,26 +1,27 @@
-/** @format */
-
 import { ethers } from "ethers";
-import { buyAmount, config, gasLimit, wssProvider } from "../Config/config";
+import { buyAmount, config, gasLimit, wssProvider } from "../config/config";
 import { Overloads, txContents } from "../contents/interface";
-import ABI from "../utils/contract-abi.json";
-import { buy } from "../uniSwap/buy";
-import { approve } from "../uniSwap/approveToken";
+
+import { buy } from "../core/buy";
+import { approve } from "../core/approveToken";
 // import { Contract } from "../contents/common";
-import { swapExactTokensForETHSupportingFeeOnTransferTokens } from "../uniSwap/sellToken";
-import { getAmounts } from "../uniSwap/getAmounts";
+import { swapExactTokensForETH } from "../core/sellToken";
+import { getAmounts } from "../core/getAmounts";
+import { UNISWAP_ABI } from "../utils/uniswap";
+import { isHoneypot } from "../core/honeypot";
+import { sendNotification } from "../telegram/bot";
 
 const methodsExcluded = ["0x0", "0x"];
 let tokensToMonitor: any = config.TOKEN_TO_MONITOR;
 
 //decode the txContents.data to get the method name
-const abiIn = new ethers.utils.Interface(ABI);
+const abiIn = new ethers.utils.Interface(UNISWAP_ABI);
 
 export const dataProcessing = async (txContents: txContents) => {
   //exclude transfer method
   if (!methodsExcluded.includes(txContents.data)) {
     //compare transaction router to unuswap router address
-    let routerAddress = txContents.to?.toLocaleLowerCase();
+    let routerAddress = txContents.to?.toLowerCase();
     // console.log("fount it ", routerAddress);
     if (routerAddress == config.UNISWAP_ROUTER) {
       const decodedData = abiIn.parseTransaction({ data: txContents.data });
@@ -64,8 +65,8 @@ export const dataProcessing = async (txContents: txContents) => {
       // Filter the addLiquidity method
       if (methodName == "addLiquidity") {
         let token;
-        let tokenA = decodedData.args.token.toLocaleLowerCase();
-        let tokenB = decodedData.args.token.toLocaleLowerCase();
+        let tokenA = decodedData.args.tokenA.toLowerCase();
+        let tokenB = decodedData.args.tokenB.toLowerCase();
         console.log(`TokenA: ${tokenA}, TokenB: ${tokenB}`);
 
         if (tokenA === tokensToMonitor[0]) {
@@ -74,38 +75,47 @@ export const dataProcessing = async (txContents: txContents) => {
           token = tokenB;
         }
       } else if (methodName == "addLiquidityETH") {
-        let token = decodedData.args.token.toLocaleLowerCase();
+        let token = decodedData.args.token.toLowerCase();
         console.log("token", token);
 
-        if (token) {
-          let buyPath = [config.WETH_ADDRESS, token];
+        let rugStatus = await isHoneypot(token);
+        if (rugStatus === false) {
+          console.log("Not a rug");
 
-          if (buyPath) {
-            const txHash = await buy(buyPath, overloads);
-            delete overloads.value;
+          if (token) {
+            let buyPath = [config.WETH_ADDRESS, token];
 
-            if (txHash.success === true) {
-              overloads["nonce"]! += 1;
+            if (buyPath) {
+              const txHash = await buy(buyPath, overloads);
+              delete overloads.value;
 
-              const approveHash = await approve(token, overloads);
+              if (txHash.success === true) {
+                overloads["nonce"]! += 1;
 
-              if (approveHash.success === true) {
-                let sellPath = [token, config.WETH_ADDRESS];
+                const approveHash = await approve(token, overloads);
+                const message = `Bought : https://goerli.etherscan.io/tx/${txHash?.data}`;
+                await sendNotification(message);
 
-                const amounts = await getAmounts(sellPath, token);
+                if (approveHash.success === true) {
+                  let sellPath = [token, config.WETH_ADDRESS];
 
-                if (amounts?.amountOutMinTx! >= 0) {
-                  overloads["nonce"]! += 1;
-                  await swapExactTokensForETHSupportingFeeOnTransferTokens(
-                    sellPath,
-                    overloads,
-                    amounts?.amountIn,
-                    amounts?.amountOutMin
-                  );
+                  const amounts = await getAmounts(sellPath, token);
+
+                  if (amounts?.amountOutMinTx! >= 0) {
+                    overloads["nonce"]! += 1;
+                    await swapExactTokensForETH(
+                      sellPath,
+                      overloads,
+                      amounts?.amountIn,
+                      amounts?.amountOutMin
+                    );
+                  }
                 }
               }
             }
           }
+        } else {
+          console.log("Its a rug");
         }
       }
     }

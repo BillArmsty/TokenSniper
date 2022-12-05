@@ -1,5 +1,3 @@
-/** @format */
-
 import { ethers } from "ethers";
 
 require("dotenv").config();
@@ -11,11 +9,7 @@ export const buyAmount = 0.000001;
 export const walletAddress = ethers.utils.getAddress(
   process.env.WALLET_ADDRESS!
 );
-// export const SELL_TO_ADDRESS = process.env.BUY_WALLET_ADDRESS!;
 
-// export const sellToWalletAddress = ethers.utils.getAddress(
-//   process.env.BUY_WALLET_ADDRESS!!
-// );
 export const wssProvider = new ethers.providers.WebSocketProvider(WSS_URL);
 
 export const config = {
@@ -27,7 +21,7 @@ export const config = {
   TOKEN_TO_MONITOR: process.env.TOKEN_TO_MONITOR,
   WETH_ADDRESS: "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6",
 };
-export const SLIPPAGE=50;
+export const SLIPPAGE = 50;
 
 export const approveABI = [
   "function approve(address spender, uint value) external returns (bool)",

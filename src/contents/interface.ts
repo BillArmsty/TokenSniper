@@ -1,11 +1,9 @@
-// const { BigNumber } = require("ethers");
-
 export interface txContents {
   hash: string;
   from: string;
   to: any;
   maxPriorityFeePerGas?: any;
-  maxFeePerGas?: any; 
+  maxFeePerGas?: any;
   gasPrice: any;
   gas: any;
   data: string;

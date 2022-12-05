@@ -1,7 +1,7 @@
-/** @format */
+
 
 import { ethers } from "ethers";
-import { approveABI, config, MAX_INT } from "../Config/config";
+import { approveABI, config, MAX_INT } from "../config/config";
 import { account } from "../contents/common";
 import { Overloads } from "../contents/interface";
 
